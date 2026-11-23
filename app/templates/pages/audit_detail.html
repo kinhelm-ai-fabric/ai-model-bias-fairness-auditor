@@ -1,0 +1,135 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ audit.name }} — Bias & Fairness Auditor{% endblock %}
+{% block body_class %}page-audit-detail{% endblock %}
+
+{% block help_title %}Audit Detail Help{% endblock %}
+{% block help_content %}
+<p>This page shows the details and results of a bias audit.</p>
+<ul>
+    <li><strong>Metrics</strong> — Fairness metrics computed from your dataset, grouped by metric type.</li>
+    <li><strong>Re-run Analysis</strong> — Recompute metrics if you have updated the dataset.</li>
+    <li><strong>Generate AI Report</strong> — Use the Kindo AI agent to produce an audit report with findings and recommendations.</li>
+</ul>
+<p><strong>Key thresholds:</strong></p>
+<ul>
+    <li>Disparate Impact Ratio below 0.8 indicates potential adverse impact (EEOC four-fifths rule).</li>
+    <li>Statistical Parity Difference and Equal Opportunity Difference near 0 indicate fairness.</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ audit.name }}</h1>
+    <div class="page-header-actions">
+        <button class="btn btn-icon" onclick="openHelp()" title="Help">?</button>
+    </div>
+</div>
+
+<div class="audit-meta">
+    <div class="meta-item">
+        <strong>Status:</strong>
+        <span class="status-badge status-{{ audit.status }}">{{ audit.status }}</span>
+    </div>
+    <div class="meta-item">
+        <strong>Protected Attribute:</strong> <code>{{ audit.protected_attribute }}</code>
+    </div>
+    <div class="meta-item">
+        <strong>Favorable Label:</strong> <code>{{ audit.favorable_label }}</code>
+    </div>
+    <div class="meta-item">
+        <strong>Dataset:</strong> {{ audit.dataset_filename or 'None' }}
+    </div>
+    {% if audit.description %}
+    <div class="meta-item">
+        <strong>Description:</strong> {{ audit.description }}
+    </div>
+    {% endif %}
+    <div class="meta-item">
+        <strong>Created:</strong> {{ audit.created_at }}
+    </div>
+</div>
+
+<div class="audit-actions">
+    {% if audit.dataset_filename %}
+    <form method="POST" action="{{ url_for('audits.audit_run', audit_id=audit.id) }}" class="inline-form">
+        <button type="submit" class="btn btn-secondary">Re-run Analysis</button>
+    </form>
+    {% endif %}
+    {% if results %}
+    <form method="POST" action="{{ url_for('audits.audit_generate_report', audit_id=audit.id) }}" class="inline-form">
+        <button type="submit" class="btn btn-primary">Generate AI Report</button>
+    </form>
+    {% endif %}
+</div>
+
+{% if results %}
+<section class="results-section">
+    <h2>Fairness Metrics</h2>
+
+    {% set cross_group = [] %}
+    {% set per_group = [] %}
+    {% for r in results %}
+        {% if r.metric_name in ['Disparate Impact Ratio', 'Statistical Parity Difference', 'Equal Opportunity Difference'] %}
+            {% set _ = cross_group.append(r) %}
+        {% else %}
+            {% set _ = per_group.append(r) %}
+        {% endif %}
+    {% endfor %}
+
+    {% if cross_group %}
+    <h3>Cross-Group Metrics</h3>
+    <div class="metrics-grid">
+        {% for r in cross_group %}
+        <div class="metric-card {% if r.metric_name == 'Disparate Impact Ratio' and r.metric_value is not none and r.metric_value < 0.8 %}metric-warning{% endif %}">
+            <div class="metric-name">{{ r.metric_name }}</div>
+            <div class="metric-value">{{ '%.4f'|format(r.metric_value) if r.metric_value is not none else 'N/A' }}</div>
+            <div class="metric-group">{{ r.group_name }}</div>
+            <div class="metric-detail">{{ r.details }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if per_group %}
+    <h3>Per-Group Metrics</h3>
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Group</th>
+                    <th>Value</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in per_group %}
+                <tr>
+                    <td>{{ r.metric_name }}</td>
+                    <td><code>{{ r.group_name }}</code></td>
+                    <td>{{ '%.4f'|format(r.metric_value) if r.metric_value is not none else 'N/A' }}</td>
+                    <td>{{ r.details }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</section>
+{% else %}
+<div class="empty-state">
+    <p>No metrics computed yet. {% if audit.dataset_filename %}Click <strong>Re-run Analysis</strong> to compute metrics.{% else %}Upload a dataset to run analysis.{% endif %}</p>
+</div>
+{% endif %}
+
+{% if report %}
+<section class="report-section">
+    <h2>AI Audit Report</h2>
+    <div class="report-content">
+        {{ report.report_text | replace('\n', '<br>') | safe }}
+    </div>
+    <p class="report-timestamp">Generated: {{ report.created_at }}</p>
+</section>
+{% endif %}
+{% endblock %}

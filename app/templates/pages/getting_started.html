@@ -1,0 +1,110 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Getting Started — Bias & Fairness Auditor{% endblock %}
+{% block body_class %}page-getting-started{% endblock %}
+
+{% block help_title %}Getting Started Help{% endblock %}
+{% block help_content %}
+<p>This guide walks you through setting up and using the AI Model Bias & Fairness Auditor.</p>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Getting Started</h1>
+    <button class="btn btn-icon" onclick="openHelp()" title="Help">?</button>
+</div>
+
+<nav class="quick-nav">
+    <a href="#step-1">What Is This App?</a>
+    <a href="#step-2">Prerequisites</a>
+    <a href="#step-3">Prepare Your Data</a>
+    <a href="#step-4">Run an Audit</a>
+    <a href="#step-5">Generate a Report</a>
+    <a href="#step-6">Next Steps</a>
+</nav>
+
+<div class="steps-container">
+    <div class="step-card" id="step-1">
+        <div class="step-badge">1</div>
+        <div class="step-content">
+            <h2>What Is This App?</h2>
+            <p>The AI Model Bias & Fairness Auditor helps you detect and measure bias in machine learning model predictions. Upload your model's predictions alongside demographic data, and the tool computes industry-standard fairness metrics. An AI agent then analyzes the results and generates an audit report with findings and recommendations.</p>
+        </div>
+    </div>
+
+    <div class="step-card" id="step-2">
+        <div class="step-badge">2</div>
+        <div class="step-content">
+            <h2>Prerequisites</h2>
+            <ul>
+                <li>A CSV file containing your model's predictions, ground-truth labels, and at least one protected attribute column (e.g., gender, race, age group).</li>
+                <li>Knowledge of which column is your protected attribute and what the favorable label value is (e.g., "1" for approved, "yes" for selected).</li>
+                <li>(Optional) A Kindo API key and agent ID for AI-powered report generation.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="step-card" id="step-3">
+        <div class="step-badge">3</div>
+        <div class="step-content">
+            <h2>Prepare Your Data</h2>
+            <p>Your CSV file should have at minimum these columns:</p>
+            <table class="data-table">
+                <thead>
+                    <tr><th>Column</th><th>Description</th><th>Example</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>label</code></td><td>Ground truth outcome</td><td>1, 0</td></tr>
+                    <tr><td><code>prediction</code></td><td>Model's predicted outcome</td><td>1, 0</td></tr>
+                    <tr><td><em>protected attribute</em></td><td>Demographic group column</td><td>Male, Female</td></tr>
+                </tbody>
+            </table>
+            <p>Column names are configurable. The protected attribute column can have any name — you specify it when creating the audit.</p>
+        </div>
+    </div>
+
+    <div class="step-card" id="step-4">
+        <div class="step-badge">4</div>
+        <div class="step-content">
+            <h2>Run an Audit</h2>
+            <ol>
+                <li>Click <strong>New Audit</strong> in the navigation bar.</li>
+                <li>Enter a name and description for your audit.</li>
+                <li>Upload your CSV dataset.</li>
+                <li>Enter the name of the protected attribute column.</li>
+                <li>Enter the favorable label value (default is "1").</li>
+                <li>Click <strong>Create Audit</strong> — the analysis runs immediately.</li>
+            </ol>
+            <p>Results appear on the audit detail page with per-group and cross-group fairness metrics.</p>
+        </div>
+    </div>
+
+    <div class="step-card" id="step-5">
+        <div class="step-badge">5</div>
+        <div class="step-content">
+            <h2>Generate an AI Report</h2>
+            <p>After running the analysis, click <strong>Generate AI Report</strong> on the audit detail page. The Kindo AI agent analyzes your metrics and produces a report with:</p>
+            <ul>
+                <li>An executive summary of findings</li>
+                <li>Severity-rated bias findings per metric</li>
+                <li>Actionable recommendations for mitigation</li>
+                <li>Regulatory compliance notes</li>
+            </ul>
+            <p>If the Kindo agent is not configured, a placeholder report is generated with basic guidance.</p>
+        </div>
+    </div>
+
+    <div class="step-card" id="step-6">
+        <div class="step-badge">6</div>
+        <div class="step-content">
+            <h2>Next Steps</h2>
+            <ul>
+                <li>Review the <a href="{{ url_for('audits.audit_list') }}">Audits</a> page to manage your audits.</li>
+                <li>Experiment with different protected attributes on the same dataset.</li>
+                <li>Compare results across model versions to track fairness improvements.</li>
+                <li>Share audit reports with compliance teams and stakeholders.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

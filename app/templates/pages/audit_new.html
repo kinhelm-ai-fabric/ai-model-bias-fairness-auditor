@@ -1,0 +1,59 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}New Audit — Bias & Fairness Auditor{% endblock %}
+{% block body_class %}page-audit-new{% endblock %}
+
+{% block help_title %}New Audit Help{% endblock %}
+{% block help_content %}
+<p>Create a new bias audit by uploading a CSV dataset and specifying the protected attribute.</p>
+<ul>
+    <li><strong>Audit Name</strong> — A descriptive name for this audit (e.g., "Loan Approval Model - Gender Bias").</li>
+    <li><strong>Dataset</strong> — A CSV file with columns for predictions, labels, and the protected attribute.</li>
+    <li><strong>Protected Attribute</strong> — The column name in your CSV that contains demographic group data.</li>
+    <li><strong>Favorable Label</strong> — The value in the prediction/label columns that represents a favorable outcome (default: "1").</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>New Audit</h1>
+    <button class="btn btn-icon" onclick="openHelp()" title="Help">?</button>
+</div>
+
+<div class="form-container">
+    <form method="POST" enctype="multipart/form-data" class="audit-form">
+        <div class="form-group">
+            <label for="name">Audit Name <span class="required">*</span></label>
+            <input type="text" id="name" name="name" required placeholder="e.g., Loan Approval Model - Gender Bias">
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="3" placeholder="Describe what this audit is evaluating..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="dataset">Dataset (CSV) <span class="required">*</span></label>
+            <input type="file" id="dataset" name="dataset" accept=".csv" required>
+            <p class="form-hint">CSV must include columns for predictions, labels, and the protected attribute.</p>
+        </div>
+
+        <div class="form-group">
+            <label for="protected_attribute">Protected Attribute Column <span class="required">*</span></label>
+            <input type="text" id="protected_attribute" name="protected_attribute" required placeholder="e.g., gender, race, age_group">
+            <p class="form-hint">The exact column name in your CSV that contains demographic group data.</p>
+        </div>
+
+        <div class="form-group">
+            <label for="favorable_label">Favorable Label Value</label>
+            <input type="text" id="favorable_label" name="favorable_label" value="1" placeholder="e.g., 1, yes, approved">
+            <p class="form-hint">The value in the label/prediction columns that represents a positive outcome.</p>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Create Audit</button>
+            <a href="{{ url_for('audits.audit_list') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

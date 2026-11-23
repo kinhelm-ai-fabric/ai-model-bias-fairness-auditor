@@ -1,0 +1,13 @@
+version: "1.0"
+project: "ai-model-bias-fairness-auditor"
+framework: "flask"
+entry_point: "wsgi:app"
+
+agents:
+  - name: "Model Bias Audit Agent"
+    config: "agent/agents/bias-audit-agent.yaml"
+    env_var_name: KINDO_BIAS_AUDIT_AGENT_ID
+    overview: >
+      Analyzes computed fairness metrics from model predictions and generates
+      a structured audit report with findings, severity ratings, and
+      actionable recommendations for bias mitigation.

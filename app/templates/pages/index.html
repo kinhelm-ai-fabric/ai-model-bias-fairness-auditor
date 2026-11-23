@@ -1,0 +1,59 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Dashboard — Bias & Fairness Auditor{% endblock %}
+{% block body_class %}page-index{% endblock %}
+
+{% block help_title %}Dashboard Help{% endblock %}
+{% block help_content %}
+<p>The dashboard provides an overview of your bias auditing workflow.</p>
+<ul>
+    <li><strong>New Audit</strong> — Upload a dataset and configure a bias audit.</li>
+    <li><strong>View Audits</strong> — See all past and current audits.</li>
+    <li><strong>Getting Started</strong> — Learn how to use this application.</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>AI Model Bias &amp; Fairness Auditor</h1>
+    <button class="btn btn-icon" onclick="openHelp()" title="Help">?</button>
+</div>
+
+<div class="dashboard-grid">
+    <div class="card card-hero">
+        <div class="card-body">
+            <h2>Audit Your AI Models for Bias</h2>
+            <p>Upload model predictions alongside demographic data to compute fairness metrics such as disparate impact, statistical parity, and equal opportunity. Generate AI-powered reports with actionable recommendations.</p>
+            <div class="card-actions">
+                <a href="{{ url_for('audits.audit_new') }}" class="btn btn-primary">Start New Audit</a>
+                <a href="{{ url_for('main.getting_started') }}" class="btn btn-secondary">Getting Started</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h3>How It Works</h3>
+            <ol class="steps-list">
+                <li>Upload a CSV with predictions, labels, and a protected attribute column.</li>
+                <li>Select the protected attribute (e.g., gender, race, age group).</li>
+                <li>Run the analysis to compute fairness metrics automatically.</li>
+                <li>Generate an AI-powered audit report with findings and recommendations.</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h3>Metrics Computed</h3>
+            <ul class="metric-list">
+                <li><strong>Disparate Impact Ratio</strong> — Ratio of selection rates between groups (threshold: 0.8)</li>
+                <li><strong>Statistical Parity Difference</strong> — Difference in positive prediction rates</li>
+                <li><strong>Equal Opportunity Difference</strong> — Difference in true positive rates</li>
+                <li><strong>Per-group Selection Rate</strong> — Fraction predicted favorable per group</li>
+                <li><strong>Per-group TPR &amp; FPR</strong> — True/false positive rates per group</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

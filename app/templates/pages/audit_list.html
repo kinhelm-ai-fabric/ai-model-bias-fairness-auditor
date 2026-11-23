@@ -1,0 +1,63 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Audits — Bias & Fairness Auditor{% endblock %}
+{% block body_class %}page-audits{% endblock %}
+
+{% block help_title %}Audits List Help{% endblock %}
+{% block help_content %}
+<p>This page lists all bias audits you have created. Each audit represents a dataset analyzed for fairness across a protected attribute.</p>
+<ul>
+    <li><strong>Status</strong> — pending (not yet run), running, completed, or failed.</li>
+    <li>Click an audit name to view its detail page with metrics and reports.</li>
+    <li>Click <strong>New Audit</strong> to create a new audit.</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Audits</h1>
+    <div class="page-header-actions">
+        <button class="btn btn-icon" onclick="openHelp()" title="Help">?</button>
+        <a href="{{ url_for('audits.audit_new') }}" class="btn btn-primary">New Audit</a>
+    </div>
+</div>
+
+{% if audits %}
+<div class="table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Protected Attribute</th>
+                <th>Dataset</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for audit in audits %}
+            <tr>
+                <td><a href="{{ url_for('audits.audit_detail', audit_id=audit.id) }}">{{ audit.name }}</a></td>
+                <td><code>{{ audit.protected_attribute }}</code></td>
+                <td>{{ audit.dataset_filename or '—' }}</td>
+                <td>
+                    <span class="status-badge status-{{ audit.status }}">{{ audit.status }}</span>
+                </td>
+                <td>{{ audit.created_at }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('audits.audit_delete', audit_id=audit.id) }}" class="inline-form" onsubmit="return confirm('Delete this audit?')">
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <p>No audits yet. <a href="{{ url_for('audits.audit_new') }}">Create your first audit</a> to get started.</p>
+</div>
+{% endif %}
+{% endblock %}
